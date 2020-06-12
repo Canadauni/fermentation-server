@@ -1,11 +1,12 @@
 require('dotenv').config()
 const express = require('express')
-const aedes = require('aedes')()
+const Aedes = require('aedes')
+const aedes = new Aedes()
 const app = express()
 const helmet = require('helmet')
 const mqserver = require('net').createServer(aedes.handle)
-const { Client } = require('pg')
-const client = new Client({
+const PGclient = require('pg').Client
+const client = new PGclient({
   connectionString: process.env.DB_URL,
   ssl: {
     rejectUnauthorized: false
