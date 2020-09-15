@@ -1,6 +1,8 @@
+
+
 module.exports = (app) => {
   app.get('/', (req,res) => {
-    res.send('Hello World!')
+    res.render('index')
   })
   app.get('/recording', (req,res) => {
     res.json({"recording":app.locals.recording})

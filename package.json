@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -15,6 +16,10 @@
     "helmet": "^3.23.3",
     "mqtt": "^4.2.1",
     "pg": "^8.3.3",
+    "pug": "^3.0.0",
     "websocket-stream": "^5.5.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
   }
 }

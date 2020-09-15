@@ -1,0 +1,84 @@
+head
+    title Fermentation
+    script(src="https://d3js.org/d3.v6.min.js")
+    script(src="https://unpkg.com/mqtt/dist/mqtt.min.js")
+
+
+h1 Fermentation Server
+
+div#plot
+
+script.
+    const data = []
+    let globalX = 0
+    const client = mqtt.connect('mqtt://localhost:8080')
+    client.on('connect', ()=>console.log('connected'))
+    client.subscribe('fermentation', (err, granted) => {
+        if (err) {
+            console.log(err)
+        }
+    })
+    
+    const margin = {top: 20, right: 30, bottom: 30, left: 40}
+    const width = window.innerWidth - margin.left - margin.right
+    const height = 500
+    const x = d3.scaleLinear()
+        .domain([0,100])
+        .range([margin.left, width-margin.right])
+
+    const y = d3.scaleLinear()
+        .domain([0,100])
+        .range([height-margin.bottom, margin.top])
+
+    const svg = d3.select('#plot').append('svg')
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+        .append('g')
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+    svg.append('g')
+            .attr("transform", "translate(0," + (height - margin.bottom) + ")")
+            .call(d3.axisBottom(x).ticks(width/80).tickSizeOuter(0))
+
+    svg.append('g')
+            .attr("transform", "translate(" + margin.left + ',0)')
+            .call(d3.axisLeft(y))
+
+    const line = d3.line()
+        .x(d => x(d.x))
+        .y(d => y(d.temp))
+        .curve(d3.curveCatmullRom.alpha(0.75))
+
+    svg.append('path')
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 3)
+        .attr("class", "line")
+        .attr("d", line)
+
+    client.on('message', (topic, message) => {
+        if(topic=='fermentation') {
+            let t = parseInt(message.toString())
+            //- console.log(t)
+            data.push({
+                x: globalX,
+                temp: t
+            })
+            if(data.length>20) {
+                d3.select(".line")
+                    .attr("d", line)
+                    .attr("transform", null)
+                    .transition()
+                    .attr("transform", "translate(" + x(globalX-5) + ")")
+                data.shift()
+            }
+            d3.select(".line")
+                .attr("d", line)
+                .attr("transform", null)
+                .transition()
+            globalX += 5
+        }  
+    })
+
+

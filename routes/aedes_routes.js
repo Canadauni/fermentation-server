@@ -18,6 +18,10 @@ module.exports = (aedes) => {
     console.log(err.stack)
   })
 
+  aedes.on('keepaliveTimeout', (client, err) => {
+    console.log(client)
+  })
+
   aedes.on('publish', (packet, client) => {
     if (client) {
       console.log('message from client', packet)
